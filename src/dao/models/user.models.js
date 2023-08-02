@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         match: /^\S+@\S+\.\S+$/
     },
-    birth_year:{
+    birth_date:{
         type: Date,
         required: true,
     },

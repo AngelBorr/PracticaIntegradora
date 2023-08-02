@@ -1,14 +1,16 @@
 import express from 'express';
 import productsRouter from './router/product.router.js';
 import cartsRouter from './router/cart.router.js';
-//import __dirname from './utils.js'
+import __dirname from './utils.js'
 import mongoose from 'mongoose';
 import displayRoutes from "express-routemap";
-//import sessionsRouter from './routes/sessions.router.js'
+import sessionsRouter from './router/session.router.js'
 import MongoStore from 'connect-mongo';
 import session from 'express-session';
-//import passport from 'passport';
-//import initializePassport from './config/passport.config.js';
+import passport from 'passport';
+import initializePassport from './config/passport.config.js';
+import handlerbars from 'express-handlebars';
+import viewsRouter from './router/views.router.js'
 
 
 const app = express();
@@ -21,10 +23,10 @@ const DB_NAME = "PracticaIntegradora";
 const rutaMongo = `mongodb+srv://${USER_MONGO}:${PASS_MONGO}@cluster0.wd5qrnn.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`;
 
 //configuracion plantillas y handlebars
-/* app.engine('handlebars', handlerbars.engine()); 
+app.engine('handlebars', handlerbars.engine()); 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
-app.use(express.static(__dirname + '/public')); */
+app.use(express.static(__dirname + '/public'));
 
 //configuracion Session
 app.use(session({
@@ -37,20 +39,18 @@ app.use(session({
     saveUninitialized: false
 }))
 //configuracion passport
-/* initializePassportForGithub();
 initializePassport();
 app.use(passport.initialize());
-app.use(passport.session());  */
 
 //configuracion express
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
 //rutas
-//app.use('/', viewsRouter);
+app.use('/', viewsRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
-//app.use('/api/sessions', sessionsRouter);
+app.use('/api/sessions', sessionsRouter);
 
 //server en puerto 8080
 const httpServer = app.listen(8080, () => {
@@ -64,3 +64,8 @@ mongoose.connect(rutaMongo, {
     useUnifiedTopology: true
 }).then(() => console.log('conectado a mongo')).catch((err) => {console.error(err)});
 
+/* console.log('Carpeta en la cual estamos parados: ', process.cwd());
+console.log('Sistema operativo: ', process.platform);
+console.log('Process ID: ', process.pid);
+console.log('Memory Usage: ', process.memoryUsage());
+console.log('Version de Node: ', process.version); */

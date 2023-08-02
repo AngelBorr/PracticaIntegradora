@@ -1,14 +1,16 @@
-import UserManager from "../dao/userManagerMongo.js";
+import UserManager from "../dao/userManager.js";
 import { Router } from "express";
-import { createHash } from "../utils.js";
 import passport from "passport";
+import cookieParser from "cookie-parser";
+//import { authToken } from "../utils.js";
 
 const router = Router();
+router.use(cookieParser());
 
 const userManager = new UserManager;
 
 //ruta post para el registerUser
-router.post('/register', passport.authenticate('register', {failureRedirect:'/api/sessions/failRegister'}), async (req, res) => {
+router.post('/register', passport.authenticate('register'), async (req, res) => {
     return res.status(200).send({status: 'success', message:'Usuario registrado'})
     
 })
@@ -18,60 +20,18 @@ router.get('/failRegister', async (req, res) => {
     res.send({error:'Fallo'})
 })
 //ruta login
-router.post('/login', passport.authenticate('login', {failureRedirect:'/api/sessions/failLogin'}) , async (req, res) => {
+router.post('/login', passport.authenticate('login', { session: false }), async (req, res) => {
     
     if(!req.user){
         return res.status(400).send({status:'Error', error:'Credenciales Invalidas'})
     }
-    
-    req.session.user = {
-        name: `${req.user.firstName} ${req.user.lastName}`,
-        email: req.user.email,
-        age: req.user.age,
-        //rol: req.user.admin            
-    }
-    
-    return res.status(200).send({status:'usuario autenticado', payload: req.user})
+    return res.cookie('cookieToken', req.user, { httpOnly: true }).send({status:'usuario autenticado', message: 'cookie set'})
     
 })
 
-router.get('/failLogin', (req, res) => {    
-    res.send({error:'Fallo al Logearse'})
-})
-//ruta logout elimina la session
-router.post('/logout', (req, res) => {
-    try {
-        req.session.destroy(error =>{
-            if(!error) res.status(200).send('Session eliminada');
-            else res.status(400).send({status: 'Error al eliminar la session', body: error})
-        })
-    } catch (error) {
-        return res.status(500).json('Se produjo un error al que obtener los datos para eliminar la session', error.message)
-    }
-    
-})
-//ruta resetPassword
-router.put('/resetPassword', async (req, res) => {
-    try {
-        const {email, newpassword} = req.body;
-        if(!email || !newpassword){
-            return res.status(400).send('Email y/o Contraseña no ingresados, son requeridos')
-        }
-        const user = await userManager.getUser(email); 
-        if (!user){
-            return res.status(404).send("Usuario incorrectos y/o inexistente")
-        };
-        //actualizar contraseña en base de datos
-        const updatePassword = createHash(newpassword);
-        //modificar el manager
-        await userManager.updateUser(user._id, {password: updatePassword});
-
-        res.status(200).send('contraseña restaurada exitosamente')
-        
-    } catch (error) {
-        return res.status(500).send('Se produjo un error al que obtener los datos para restaurar la contraseña', error.message)
-    }
-    
+//ruta current
+router.get('/current', passport.authenticate ('current', { session: false }), async (req, res) => {
+    res.send(req.user);    
 })
 
 

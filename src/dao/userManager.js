@@ -9,9 +9,9 @@ class UserManager{
     async getUser(email){
         try {
             const user = await this.userModel.findOne({email});            
-            if(!user){
-                return `No se ha encontrado Usuario resgistrado con este E-mail:(${email}), verifique que los datos ingresados sean los correctos y vuelve a intentarlo`;
-            }
+            /* if(!user){
+                throw new Error('No existe usuario con este email: ', email)
+            } */
             return user;
         } catch (error) {
             throw new Error('Se produjo un error al leer el E-mail ingresado')
