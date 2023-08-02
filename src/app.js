@@ -11,14 +11,16 @@ import passport from 'passport';
 import initializePassport from './config/passport.config.js';
 import handlerbars from 'express-handlebars';
 import viewsRouter from './router/views.router.js'
+import env from './config.js';
 
 
 const app = express();
 
 //data MONGODB
-const USER_MONGO = "angel3";
-const PASS_MONGO = "FPJQI2hsDZFwif90";
-const DB_NAME = "PracticaIntegradora";
+const PORT = env.port; 
+const USER_MONGO = env.userMongo;
+const PASS_MONGO = env.passMongo;
+const DB_NAME = env.dbColecction;
 
 const rutaMongo = `mongodb+srv://${USER_MONGO}:${PASS_MONGO}@cluster0.wd5qrnn.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`;
 
@@ -28,7 +30,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
 app.use(express.static(__dirname + '/public'));
 
-//configuracion Session
+//configuracion Session 
 app.use(session({
     store: new MongoStore({
         mongoUrl: rutaMongo,
@@ -36,7 +38,7 @@ app.use(session({
     }),
     secret: "sessionSecret",
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false 
 }))
 //configuracion passport
 initializePassport();
@@ -53,7 +55,7 @@ app.use('/api/carts', cartsRouter);
 app.use('/api/sessions', sessionsRouter);
 
 //server en puerto 8080
-const httpServer = app.listen(8080, () => {
+const httpServer = app.listen(`${PORT}`, () => {
     displayRoutes(app);
     console.log('servidor escuchando en el puerto 8080')
 })
@@ -64,8 +66,3 @@ mongoose.connect(rutaMongo, {
     useUnifiedTopology: true
 }).then(() => console.log('conectado a mongo')).catch((err) => {console.error(err)});
 
-/* console.log('Carpeta en la cual estamos parados: ', process.cwd());
-console.log('Sistema operativo: ', process.platform);
-console.log('Process ID: ', process.pid);
-console.log('Memory Usage: ', process.memoryUsage());
-console.log('Version de Node: ', process.version); */

@@ -3,6 +3,7 @@ import { dirname } from 'path';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { error } from 'console';
+import env from './config.js';
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
@@ -15,10 +16,10 @@ export default __dirname;
 
 //configuracion JWT
 
-export const PRIVATE_KEY = 'keyPrivate'; //luego exportar desde .env
+export const PRIVATE_KEY = env.keyPrivate; //luego exportar desde .env
 
 export const generateToken = (user) => {
-    const token = jwt.sign({user}, PRIVATE_KEY, {expiresIn: '24h'})
+    const token = jwt.sign({user}, `${PRIVATE_KEY}`, {expiresIn: '24h'})
     return token
 }
 

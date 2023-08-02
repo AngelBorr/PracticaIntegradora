@@ -2,7 +2,6 @@ import UserManager from "../dao/userManager.js";
 import { Router } from "express";
 import passport from "passport";
 import cookieParser from "cookie-parser";
-//import { authToken } from "../utils.js";
 
 const router = Router();
 router.use(cookieParser());
@@ -33,6 +32,5 @@ router.post('/login', passport.authenticate('login', { session: false }), async 
 router.get('/current', passport.authenticate ('current', { session: false }), async (req, res) => {
     res.send(req.user);    
 })
-
 
 export default router
